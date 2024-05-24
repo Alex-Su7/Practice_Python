@@ -10,7 +10,7 @@ def is_time_format(s):
     return bool(re.match(r"^\d{2}:\d{2}$", s))
 
 # 处理考勤数据并生成图表的函数
-def process_attendance(input_file, output_file, plot_file):
+def process_attendance(input_file, output_file, plot_file, plot_format, chart_title, xlabel, ylabel):
     try:
         # 读取原始数据
         data = pd.read_excel(input_file, sheet_name='Sheet1')
@@ -90,9 +90,9 @@ def process_attendance(input_file, output_file, plot_file):
         ax.plot(data['dates'], data['end_times'], marker='x', linestyle='--', label=f'{name} - 下班时间')
 
     # 设置图表格式
-    plt.xlabel('日期')
-    plt.ylabel('时间')
-    plt.title('每日考勤时间分布')
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
+    plt.title(chart_title)
     plt.xticks(rotation=45)
     plt.legend()
     plt.grid(True)
@@ -100,7 +100,7 @@ def process_attendance(input_file, output_file, plot_file):
 
     try:
         # 保存图表为文件
-        plt.savefig(plot_file)
+        plt.savefig(plot_file, format=plot_format)
         plt.show()
     except Exception as e:
         logging.error(f"保存图表文件出错: {e}")
@@ -111,13 +111,17 @@ def main():
     parser.add_argument('--input', type=str, required=True, help='输入 Excel 文件路径')
     parser.add_argument('--output', type=str, required=True, help='输出 Excel 文件路径')
     parser.add_argument('--plot', type=str, required=True, help='输出图表文件路径')
+    parser.add_argument('--format', type=str, default='png', choices=['png', 'pdf', 'svg'], help='图表文件格式（默认: png）')
+    parser.add_argument('--title', type=str, default='每日考勤时间分布', help='图表标题')
+    parser.add_argument('--xlabel', type=str, default='日期', help='X轴标签')
+    parser.add_argument('--ylabel', type=str, default='时间', help='Y轴标签')
 
     args = parser.parse_args()
 
     logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     
     if os.path.exists(args.input):
-        process_attendance(args.input, args.output, args.plot)
+        process_attendance(args.input, args.output, args.plot, args.format, args.title, args.xlabel, args.ylabel)
         logging.info(f'处理后的数据已保存到 {args.output}')
         logging.info(f'图表已保存到 {args.plot}')
     else:
