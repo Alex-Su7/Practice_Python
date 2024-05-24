@@ -82,6 +82,10 @@ def process_attendance(input_file, output_file, plot_file, plot_format, chart_ti
         attendance_dict[name]['start_times'].append(start_time)
         attendance_dict[name]['end_times'].append(end_time)
 
+    # 设置字体以确保中文显示正确
+    plt.rcParams['font.sans-serif'] = ['SimHei']  # 使用黑体
+    plt.rcParams['axes.unicode_minus'] = False  # 解决负号显示问题
+
     # 创建图表
     fig, ax = plt.subplots(figsize=(12, 8))
 
